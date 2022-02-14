@@ -22,8 +22,12 @@ def dat_file_read(in_filepatch, has_header=False):
     read_list = list()
     
     lines = None
-    with open(in_filepatch, "r") as f:
-        lines = f.readlines()
+    try:
+        with open(in_filepatch, "r", encoding='utf-8') as f:
+            lines = f.readlines()
+    except UnicodeDecodeError:
+        with open(in_filepatch, 'r', encoding='utf-16') as f:
+            lines = f.readlines()
         
     for idx, line in enumerate(lines):
         if has_header and idx == 0:
@@ -46,13 +50,24 @@ def dat_data_mean(data_list, lat_start, lat_stop, lat_step):
     slice.extend([0, 0])
     val_counter = 0
     
+    slice = list()
+    slice.extend([0, 0])
+    val_counter = 0
     for record in data_list:
         lat = float(record[0])
         on2 = float(record[1])
         
-        # Check if we run out of range
-        if (lat < bottom) or (lat > top):
+        if lat == 20.29:
+            print("Critical value")
+        
+        if lat < lat_start:
+            continue
+        if lat > lat_stop:
+            continue
+               
+        if (lat < bottom) or (lat > top):                     
             while True:
+                print(f'Out of range [{bottom}:{top}]. Increase the range by <{lat_step}> for pair <{lat}>:<{on2}>')
                 slice[0] = (bottom + top) / 2
                 if val_counter != 0:
                     slice[1] = slice[1] / val_counter
@@ -79,10 +94,17 @@ def dat_data_mean(data_list, lat_start, lat_stop, lat_step):
             # Just to be on the safe side
             raise Exception("Lat is outside of range")
     
+    # Note previous algorithm lost the last slice
+    # Add last slice
+    slice[0] = (bottom + top) / 2
+    if val_counter != 0:
+        slice[1] = slice[1] / val_counter
+    mean_list.append(slice)
+    
     return mean_list  
 
 def main():
-    LAT_START = -90
+    LAT_START = -85
     LAT_STOP = 90
     LAT_STEP = 5
     INPUT_PATH_MASK = "./input/*.dat"
