@@ -116,19 +116,17 @@ def main():
     for filepath in files:
         print("Process >> " + filepath)
 
-        
-        data_list = dat_file_read(filepath, has_header=True)
-        data_list_mean = dat_data_mean(data_list, LAT_START, LAT_STOP, LAT_STEP)
-        dat_file_write(data_list_mean, f"{OUTPUT_PATH}/{os.path.basename(filepath).split('.')[0]}_mean.dat")
-    
-    '''
+        try:
+            data_list = dat_file_read(filepath, has_header=True)
+            data_list_mean = dat_data_mean(data_list, LAT_START, LAT_STOP, LAT_STEP)
+            dat_file_write(data_list_mean, f"{OUTPUT_PATH}/{os.path.basename(filepath).split('.')[0]}_mean.dat")
         except Exception as e:
             print("Cannot process >> ", filepath)
             print("Reason >> " + str(e))
             
         finally:
             print()
-    '''
+
 
     print("Script is finished")
 
