@@ -123,7 +123,6 @@ def main():
         except Exception as e:
             print("Cannot process >> ", filepath)
             print("Reason >> " + str(e))
-            
         finally:
             print()
 
