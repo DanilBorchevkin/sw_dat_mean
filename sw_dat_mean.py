@@ -57,17 +57,13 @@ def dat_data_mean(data_list, lat_start, lat_stop, lat_step):
         lat = float(record[0])
         on2 = float(record[1])
         
-        if lat == 20.29:
-            print("Critical value")
-        
-        if lat < lat_start:
-            continue
-        if lat > lat_stop:
+        if (lat < lat_start) or (lat > lat_stop):
             continue
                
-        if (lat < bottom) or (lat > top):                     
+        if (lat < bottom) or (lat > top): 
+            cycle_counter = 0                     
             while True:
-                print(f'Out of range [{bottom}:{top}]. Increase the range by <{lat_step}> for pair <{lat}>:<{on2}>')
+                #print(f'Out of range [{bottom}:{top}]. Increase the range by <{lat_step}> for pair <{lat}>:<{on2}>')
                 slice[0] = (bottom + top) / 2
                 if val_counter != 0:
                     slice[1] = slice[1] / val_counter
@@ -79,12 +75,16 @@ def dat_data_mean(data_list, lat_start, lat_stop, lat_step):
                 
                 bottom = top
                 top = bottom + lat_step
-                if top >= lat_stop:
+                if top > lat_stop:
                     bottom = lat_start
                     top = lat_start + lat_step
                     
                 if (lat >= bottom) and (lat <= top):
                     break
+                
+                cycle_counter += 1
+                if cycle_counter > 128:
+                    raise Exception('Seems code stuck. Consult with developer')
         
         # Add value to range
         if (lat >= bottom) and (lat <= top):
@@ -104,7 +104,7 @@ def dat_data_mean(data_list, lat_start, lat_stop, lat_step):
     return mean_list  
 
 def main():
-    LAT_START = -85
+    LAT_START = -90
     LAT_STOP = 90
     LAT_STEP = 5
     INPUT_PATH_MASK = "./input/*.dat"
